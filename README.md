@@ -36,7 +36,7 @@ This API helps you plan the perfect trip by:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/Travel-Planner.git
+git clone https://github.com/chittspraise/Travel-Planner.git
 cd Travel-Planner
 
 # 2. Install dependencies
@@ -305,4 +305,3 @@ MIT
 ---
 
 **Made with ❤️ for better travel planning**
-
