@@ -1,0 +1,437 @@
+# ========================================
+# Travel Planner API - GraphQL Examples
+# ========================================
+# Copy and paste these queries into Apollo Sandbox at http://localhost:4000/
+#
+# Remember: Always search for a city first to get its ID,
+# then use that ID for weather and activity queries!
+# ========================================
+
+# ========================================
+# 1. SEARCH FOR CITIES
+# ========================================
+
+# Basic city search
+query SearchCities {
+  searchCities(query: "London") {
+    id
+    name
+    country
+    countryCode
+    latitude
+    longitude
+  }
+}
+
+# Search with limit and full details
+query SearchCitiesWithDetails {
+  searchCities(query: "Paris", limit: 5) {
+    id
+    name
+    country
+    countryCode
+    latitude
+    longitude
+    admin1
+    population
+  }
+}
+
+# Search multiple cities
+query SearchNewYork {
+  searchCities(query: "New York", limit: 3) {
+    id
+    name
+    country
+    admin1
+    latitude
+    longitude
+    population
+  }
+}
+
+query SearchTokyo {
+  searchCities(query: "Tokyo") {
+    id
+    name
+    country
+    latitude
+    longitude
+  }
+}
+
+# ========================================
+# 2. GET WEATHER FORECAST
+# ========================================
+
+# Basic weather query (7 days default)
+query GetWeatherLondon {
+  getWeather(cityId: "51.5074_-0.1278") {
+    city {
+      name
+      latitude
+      longitude
+    }
+    timezone
+    forecasts {
+      date
+      temperatureMax
+      temperatureMin
+      precipitation
+      windSpeed
+      weatherDescription
+    }
+  }
+}
+
+# Weather with custom days and all fields
+query GetWeatherParisFull {
+  getWeather(cityId: "48.8566_2.3522", days: 10) {
+    city {
+      name
+      country
+      countryCode
+      latitude
+      longitude
+    }
+    timezone
+    forecasts {
+      date
+      temperatureMax
+      temperatureMin
+      precipitation
+      windSpeed
+      weatherCode
+      weatherDescription
+      snowfall
+    }
+  }
+}
+
+# Short-term forecast (3 days)
+query GetWeatherShortTerm {
+  getWeather(cityId: "40.7128_-74.006", days: 3) {
+    city {
+      name
+      country
+    }
+    timezone
+    forecasts {
+      date
+      weatherDescription
+      temperatureMax
+      temperatureMin
+    }
+  }
+}
+
+# Maximum forecast (16 days)
+query GetWeatherLongTerm {
+  getWeather(cityId: "35.6762_139.6503", days: 16) {
+    city {
+      name
+    }
+    forecasts {
+      date
+      weatherDescription
+      temperatureMax
+      temperatureMin
+      precipitation
+    }
+  }
+}
+
+# ========================================
+# 3. GET ACTIVITY RANKINGS
+# ========================================
+
+# Basic activity rankings
+query GetActivityRankings {
+  getActivityRankings(cityId: "51.5074_-0.1278", days: 7) {
+    date
+    weather {
+      weatherDescription
+      temperatureMax
+      temperatureMin
+    }
+    activities {
+      type
+      score
+      reason
+      recommended
+    }
+  }
+}
+
+# Detailed activity rankings with full weather data
+query GetActivityRankingsDetailed {
+  getActivityRankings(cityId: "48.8566_2.3522", days: 5) {
+    date
+    weather {
+      date
+      temperatureMax
+      temperatureMin
+      precipitation
+      windSpeed
+      weatherCode
+      weatherDescription
+      snowfall
+    }
+    activities {
+      type
+      score
+      reason
+      recommended
+    }
+  }
+}
+
+# Weekend activity planning (3 days)
+query GetWeekendActivities {
+  getActivityRankings(cityId: "40.7128_-74.006", days: 3) {
+    date
+    weather {
+      weatherDescription
+      temperatureMax
+    }
+    activities {
+      type
+      score
+      recommended
+      reason
+    }
+  }
+}
+
+# ========================================
+# 4. COMPLETE TRAVEL PLAN
+# ========================================
+
+# Complete travel plan - all information in one query
+query GetCompleteTravelPlan {
+  getTravelPlan(cityId: "51.5074_-0.1278", days: 7) {
+    city {
+      name
+      country
+      countryCode
+      latitude
+      longitude
+    }
+    weather {
+      timezone
+      forecasts {
+        date
+        temperatureMax
+        temperatureMin
+        precipitation
+        windSpeed
+        weatherDescription
+        snowfall
+      }
+    }
+    activityRankings {
+      date
+      activities {
+        type
+        score
+        reason
+        recommended
+      }
+    }
+  }
+}
+
+# Concise travel plan (essential info only)
+query GetTravelPlanConcise {
+  getTravelPlan(cityId: "48.8566_2.3522", days: 5) {
+    city {
+      name
+      country
+    }
+    weather {
+      timezone
+      forecasts {
+        date
+        weatherDescription
+        temperatureMax
+        temperatureMin
+      }
+    }
+    activityRankings {
+      date
+      activities {
+        type
+        score
+        recommended
+      }
+    }
+  }
+}
+
+# Weekend trip planning
+query GetWeekendTravelPlan {
+  getTravelPlan(cityId: "40.7128_-74.006", days: 3) {
+    city {
+      name
+      country
+    }
+    weather {
+      forecasts {
+        date
+        weatherDescription
+        temperatureMax
+        temperatureMin
+      }
+    }
+    activityRankings {
+      date
+      weather {
+        temperatureMax
+        weatherDescription
+      }
+      activities {
+        type
+        score
+        reason
+        recommended
+      }
+    }
+  }
+}
+
+# Two-week vacation planning
+query GetVacationPlan {
+  getTravelPlan(cityId: "35.6762_139.6503", days: 14) {
+    city {
+      name
+      country
+      latitude
+      longitude
+    }
+    weather {
+      timezone
+      forecasts {
+        date
+        weatherDescription
+        temperatureMax
+        temperatureMin
+        precipitation
+      }
+    }
+    activityRankings {
+      date
+      activities {
+        type
+        score
+        recommended
+      }
+    }
+  }
+}
+
+# ========================================
+# 5. SAMPLE CITY IDs FOR TESTING
+# ========================================
+
+# London, UK: 51.5074_-0.1278
+# Paris, France: 48.8566_2.3522
+# New York, USA: 40.7128_-74.006
+# Tokyo, Japan: 35.6762_139.6503
+# Sydney, Australia: -33.8688_151.2093
+# Dubai, UAE: 25.2048_55.2708
+# Barcelona, Spain: 41.3874_2.1686
+# Rome, Italy: 41.9028_12.4964
+# Berlin, Germany: 52.52_13.405
+# Amsterdam, Netherlands: 52.3676_4.9041
+
+# ========================================
+# 6. SAMPLE WORKFLOW
+# ========================================
+
+# Step 1: Search for your destination
+query Step1_SearchCity {
+  searchCities(query: "Barcelona", limit: 3) {
+    id
+    name
+    country
+    latitude
+    longitude
+    population
+  }
+}
+
+# Step 2: Use the ID from results above to get complete travel plan
+query Step2_GetTravelPlan {
+  getTravelPlan(cityId: "41.3874_2.1686", days: 7) {
+    city {
+      name
+      country
+    }
+    weather {
+      timezone
+      forecasts {
+        date
+        weatherDescription
+        temperatureMax
+        temperatureMin
+      }
+    }
+    activityRankings {
+      date
+      activities {
+        type
+        score
+        reason
+        recommended
+      }
+    }
+  }
+}
+
+# ========================================
+# 7. ACTIVITY TYPE EXAMPLES
+# ========================================
+
+# Activity Types Available:
+# - SKIING: Best in cold, snowy conditions
+# - SURFING: Best in warm weather with good winds
+# - INDOOR_SIGHTSEEING: Great during bad weather
+# - OUTDOOR_SIGHTSEEING: Perfect for clear, mild weather
+
+# Example: Check skiing conditions in Alpine region
+query CheckSkiingConditions {
+  getActivityRankings(cityId: "46.0207_7.7491", days: 5) {
+    date
+    weather {
+      weatherDescription
+      temperatureMax
+      temperatureMin
+      snowfall
+    }
+    activities {
+      type
+      score
+      recommended
+      reason
+    }
+  }
+}
+
+# Example: Check surfing conditions in coastal city
+query CheckSurfingConditions {
+  getActivityRankings(cityId: "-33.8688_151.2093", days: 5) {
+    date
+    weather {
+      weatherDescription
+      temperatureMax
+      windSpeed
+    }
+    activities {
+      type
+      score
+      recommended
+      reason
+    }
+  }
+}
+
