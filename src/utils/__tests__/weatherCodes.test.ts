@@ -19,8 +19,9 @@ describe('weatherCodes', () => {
         });
 
         it('should return default message for unknown codes', () => {
+            
             expect(getWeatherDescription(999)).toBe('Unknown weather condition');
-            expect(getWeatherDescription(-1)).toBe('Unknown weather condition');
+         expect(getWeatherDescription(-1)).toBe('Unknown weather condition');
         });
 
         it('should have all expected weather codes', () => {
@@ -29,12 +30,13 @@ describe('weatherCodes', () => {
                 77, 80, 81, 82, 85, 86, 95, 96, 99,
             ];
 
+            
             expectedCodes.forEach((code) => {
                 expect(WEATHER_CODE_DESCRIPTIONS[code]).toBeDefined();
                 expect(typeof WEATHER_CODE_DESCRIPTIONS[code]).toBe('string');
             });
         });
-    });
+    })
 
     describe('isSnowy', () => {
         it('should return true for snowy weather codes', () => {

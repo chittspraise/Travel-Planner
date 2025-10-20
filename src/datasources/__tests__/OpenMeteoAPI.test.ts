@@ -1,5 +1,5 @@
 import { OpenMeteoAPI } from '../OpenMeteoAPI';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -34,7 +34,7 @@ describe('OpenMeteoAPI', () => {
 
             mockedAxios.create.mockReturnValue({
                 get: jest.fn().mockResolvedValue(mockResponse),
-            } as any);
+            } as Partial<AxiosInstance> as AxiosInstance);
 
             api = new OpenMeteoAPI();
             const result = await api.searchCities('London');
@@ -62,7 +62,7 @@ describe('OpenMeteoAPI', () => {
 
             mockedAxios.create.mockReturnValue({
                 get: jest.fn().mockResolvedValue(mockResponse),
-            } as any);
+            } as Partial<AxiosInstance> as AxiosInstance);
 
             api = new OpenMeteoAPI();
 
@@ -74,7 +74,7 @@ describe('OpenMeteoAPI', () => {
         it('should throw WeatherAPIError on network error', async () => {
             mockedAxios.create.mockReturnValue({
                 get: jest.fn().mockRejectedValue(new Error('Network Error')),
-            } as any);
+            } as Partial<AxiosInstance> as AxiosInstance);
 
             api = new OpenMeteoAPI();
 
@@ -91,13 +91,13 @@ describe('OpenMeteoAPI', () => {
 
             mockedAxios.create.mockReturnValue({
                 get: mockGet,
-            } as any);
+            } as Partial<AxiosInstance> as AxiosInstance);
 
-            api = new OpenMeteoAPI();
+             api = new OpenMeteoAPI();
 
-            try {
+            try{
                 await api.searchCities('London', 5);
-            } catch (error) {
+            }catch (error) {
                 // Ignore CityNotFoundError
             }
 
@@ -116,11 +116,11 @@ describe('OpenMeteoAPI', () => {
             expect(result.latitude).toBe(51.5074);
             expect(result.longitude).toBe(-0.1278);
             expect(result.id).toBe('51.5074_-0.1278');
-            expect(result.name).toContain('51.5074');
+            expect(result.name).toContain('Lat 51');
         });
 
         it('should throw error for invalid ID format', async () => {
-            await expect(api.getCityById('invalid')).rejects.toThrow('Invalid city ID format');
+            await expect(api.getCityById('invalid')).rejects.toThrow('Bad city ID format');
         });
 
         it('should parse coordinates from city ID', async () => {
@@ -136,25 +136,25 @@ describe('OpenMeteoAPI', () => {
         it('should return weather forecast data', async () => {
             const mockResponse = {
                 data: {
-                    latitude: 51.5,
+                     latitude: 51.5 ,
                     longitude: -0.12,
-                    timezone: 'Europe/London',
-                    timezone_abbreviation: 'GMT',
-                    daily: {
-                        time: ['2024-01-15', '2024-01-16'],
-                        temperature_2m_max: [12.5, 13.2],
-                        temperature_2m_min: [6.3, 7.1],
+                     timezone: 'Europe/London' ,
+                        timezone_abbreviation: 'GMT',
+                     daily: {
+                         time: ['2024-01-15', '2024-01-16'],
+                    temperature_2m_max: [12.5, 13.2],
+                     temperature_2m_min: [6.3, 7.1],
                         precipitation_sum: [0.2, 0.0],
-                        windspeed_10m_max: [15.5, 18.2],
-                        weathercode: [1, 0],
-                        snowfall_sum: [0, 0],
+                     windspeed_10m_max: [15.5, 18.2] ,
+                      weathercode: [1, 0],
+                        snowfall_sum: [0, 0] ,
                     },
                 },
             };
 
             mockedAxios.create.mockReturnValue({
-                get: jest.fn().mockResolvedValue(mockResponse),
-            } as any);
+                get: jest.fn().mockResolvedValue(mockResponse) ,
+            } as Partial<AxiosInstance> as AxiosInstance);
 
             api = new OpenMeteoAPI();
             const result = await api.getWeatherForecast(51.5, -0.12, 2);
@@ -171,7 +171,7 @@ describe('OpenMeteoAPI', () => {
         it('should throw WeatherAPIError on network error', async () => {
             mockedAxios.create.mockReturnValue({
                 get: jest.fn().mockRejectedValue(new Error('Network Error')),
-            } as any);
+            } as Partial<AxiosInstance> as AxiosInstance);
 
             api = new OpenMeteoAPI();
 
@@ -197,7 +197,7 @@ describe('OpenMeteoAPI', () => {
 
             mockedAxios.create.mockReturnValue({
                 get: mockGet,
-            } as any);
+            } as Partial<AxiosInstance> as AxiosInstance);
 
             api = new OpenMeteoAPI();
             await api.getWeatherForecast(51.5, -0.12);

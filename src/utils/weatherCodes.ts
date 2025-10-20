@@ -1,6 +1,4 @@
-/**
- * Weather Codes from WMO conversion.
- */
+// WMO weather codes from Open-Meteo
 export const WEATHER_CODE_DESCRIPTIONS: Record<number, string> = {
     0: 'Clear sky',
     1: 'Mainly clear',
@@ -32,35 +30,26 @@ export const WEATHER_CODE_DESCRIPTIONS: Record<number, string> = {
     99: 'Thunderstorm with heavy hail',
 };
 
-/**
- * Get human-readable weather description from WMO code
- */
 export function getWeatherDescription(code: number): string {
     return WEATHER_CODE_DESCRIPTIONS[code] || 'Unknown weather condition';
 }
 
-/**
- * Categorize weather conditions
- */
 export function isSnowy(weatherCode: number): boolean {
-return [71, 73, 75, 77, 85, 86].includes(weatherCode);
+   
+    return [71, 73, 75, 77, 85, 86].includes(weatherCode);
 }
 
 export function isRainy(weatherCode: number): boolean {
-     return [
-        51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82,
-    ].includes(weatherCode);
+return [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode);
 }
 
- export function isClear(weatherCode: number): boolean {
-      return   [0, 1, 2].includes(weatherCode);
+export function isClear(weatherCode: number): boolean {
+ return [0, 1, 2].includes(weatherCode);
 }
 
-  export function isStormy(weatherCode: number): boolean {
-return [95, 96, 99].includes(weatherCode);
-}
+ export function isStormy(weatherCode: number): boolean {
+    return [95, 96, 99].includes(weatherCode);}
 
- export function isCloudy(weatherCode: number): boolean {
-    return [3, 45, 48].includes(weatherCode);
+export function isCloudy(weatherCode: number): boolean{
+    return [3, 45, 48].includes(weatherCode)
 }
-

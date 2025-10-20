@@ -1,107 +1,72 @@
-# 🌍 Travel Planner API
+# Travel-Planner API
 
-A smart GraphQL API for planning trips with weather-based activity recommendations. Built with TypeScript and Apollo Server.
+A GraphQL API that provides weather-based activity recommendations for travel planning. Built with TypeScript, Apollo Server, and Open-Meteo API.
 
-> **Perfect for:** Travel apps, trip planning tools, activity recommendation systems, and weather-based decision making.
+## Quick Start
 
-## 📋 What it Does
-
-This API helps you plan the perfect trip by:
-
-- 🔍 **Search for cities** around the world with autocomplete
-- 🌤️ **Get weather forecasts** for up to 16 days ahead
-- 🎯 **Get smart activity recommendations** based on real-time weather conditions
-  - Skiing 🎿
-  - Surfing 🏄
-  - Indoor Sightseeing 🏛️
-  - Outdoor Sightseeing 🗺️
-- 🚀 **All through a single GraphQL endpoint** - easy to integrate!
-
-## 🛠️ Tech Stack
-
-- **Node.js + TypeScript** - Type-safe backend
-- **Apollo Server** - GraphQL server
-- **Axios** - HTTP client for API calls
-- **Jest** - Testing framework
-- **Open-Meteo API** - Weather data (free, no API key needed! 🎉)
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js 18+** (check with `node --version`)
-- **npm** or **yarn**
-
-### Installation & Setup
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/chittspraise/Travel-Planner.git
-cd Travel-Planner
-
-# 2. Install dependencies
+``` bash
 npm install
-
-# 3. Start the development server
 npm run dev
 ```
 
-✅ Server will be running at `http://localhost:4000`
+The server starts at `http://localhost:4000` with GraphQL Playground enabled.
 
-🎮 Open `http://localhost:4000` in your browser to access the **GraphQL Playground**!
+## What It Does
 
-## 📜 Available Scripts
+This API enables travel planning by combining real-time weather data with activity recommendations:
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | 🔥 Start development server with hot reload |
-| `npm run build` | 📦 Build for production |
-| `npm start` | ▶️ Start production server |
-| `npm test` | 🧪 Run all tests |
-| `npm run test:watch` | 👀 Run tests in watch mode |
-| `npm test -- --coverage` | 📊 Run tests with coverage report |
-| `npm run lint` | 🔍 Run ESLint to check code quality |
-| `npm run format` | ✨ Format code with Prettier |
+- **City Search**: Autocomplete search powered by Open-Meteo's geocoding API
+- **Weather Forecasts**: Up to 16-day forecasts for any location
+- **Activity Rankings**: Intelligent scoring system that ranks activities based on weather conditions
+  - Skiing
+  - Surfing
+  - Indoor sightseeing
+  - Outdoor sightseeing
 
-## 📖 API Usage
+## Architecture
 
-### GraphQL Playground
+The codebase follows a layered architecture pattern:
 
-Once the server is running, open `http://localhost:4000` in your browser to access the Apollo Sandbox.
+```
+src/
+├── datasources/     - External API integration (Open-Meteo)
+├── services/        - Business logic (activity scoring algorithms)
+├── resolvers/       - GraphQL query handlers
+├── types/           - TypeScript interfaces & GraphQL schema
+├── utils/           - Shared utilities (weather code mappings)
+└── config/          - Configuration management
+```
 
-### Example Queries
+**Key Design Decisions:**
 
-📝 **See `examples.graphql` for a complete collection of ready-to-use queries!**
+- **DataSource Pattern**: Encapsulates all Open-Meteo API calls in a dedicated class for easy mocking and testing
+- **Service Layer**: Activity ranking logic is isolated from GraphQL concerns, making it reusable
+- **Type Safety**: Shared TypeScript types between resolvers and services prevent runtime errors
+Fully Typed (TypeScript-ready): Improves maintainability and safety.
 
-The `examples.graphql` file contains:
-- All query types with variations
-- Sample city IDs for popular destinations
-- Complete workflow examples
-- Activity-specific queries
+## API Examples
 
-Copy any query from that file and paste it directly into Apollo Sandbox.
+See `examples.graphql` for complete query examples. Basic usage:
 
-#### 1. Search for Cities
+### Search Cities
 
 ```graphql
-query SearchCities {
-  searchCities(query: "London", limit: 5) {
+uery {
+   searchCities(query: "johannesburg", limit: 5) {
     id
     name
     country
-    countryCode
     latitude
     longitude
-    population
   }
 }
 ```
 
-#### 2. Get Weather Forecast
+### Get Weather Forecast
 
 ```graphql
-query GetWeather {
-  getWeather(cityId: "51.5074_-0.1278", days: 7) {
+query {
+  getWeather(cityId: "35.6762_139.6503", days: 7) {
     city {
       name
       country
@@ -111,26 +76,20 @@ query GetWeather {
       date
       temperatureMax
       temperatureMin
+      weatherDescription
       precipitation
       windSpeed
-      weatherDescription
-      snowfall
     }
   }
 }
 ```
 
-#### 3. Get Activity Rankings
+# ## Get Activity Rankings
 
 ```graphql
-query GetActivityRankings {
-  getActivityRankings(cityId: "51.5074_-0.1278", days: 7) {
+query {
+  getActivityRankings(cityId: "35.6762_139.6503") {
     date
-    weather {
-      weatherDescription
-      temperatureMax
-      temperatureMin
-    }
     activities {
       type
       score
@@ -141,22 +100,18 @@ query GetActivityRankings {
 }
 ```
 
-#### 4. Get Complete Travel Plan
+### Get Complete Travel Plan
 
 ```graphql
-query GetTravelPlan {
-  getTravelPlan(cityId: "51.5074_-0.1278", days: 7) {
+query {
+  getTravelPlan(cityId: "-26.20227_28.04363", days: 7) {
     city {
       name
-      country
     }
     weather {
-      timezone
       forecasts {
         date
         weatherDescription
-        temperatureMax
-        temperatureMin
       }
     }
     activityRankings {
@@ -164,7 +119,6 @@ query GetTravelPlan {
       activities {
         type
         score
-        reason
         recommended
       }
     }
@@ -172,136 +126,159 @@ query GetTravelPlan {
 }
 ```
 
-## Activity Ranking System
+## Activity Scoring System
 
-The API ranks activities based on weather conditions using a sophisticated scoring algorithm:
+Each activity is scored 0-100 based on weather conditions. Activities with scores >= 50 are marked as recommended.
 
-### Skiing 🎿
-- **Ideal**: Cold temperatures (-10°C to 5°C), fresh snow, calm winds
-- **Factors**: Temperature, snowfall, wind speed, visibility
-- **Score Range**: 0-100 (recommended if ≥50)
+**Skiing**: Optimal in cold temperatures (-10°C to 5°C), requires snowfall, penalized by rain and high winds
 
-### Surfing 🏄
-- **Ideal**: Warm temperatures (>20°C), moderate winds (15-35 km/h)
-- **Factors**: Temperature, wind speed, precipitation, storms
-- **Score Range**: 0-100 (recommended if ≥50)
+**Surfing**: Prefers warm temperatures (>20°C), moderate winds (15-35 km/h) for waves, heavily penalized by storms
 
-### Indoor Sightseeing 🏛️
-- **Ideal**: Bad weather outside (rain, storms, extreme temperatures)
-- **Factors**: Weather conditions, temperature extremes, wind
-- **Score Range**: 0-100 (always viable, recommended if ≥50)
+**Indoor Sightseeing**: Base score of 50 (always viable), increases with poor outdoor conditions
 
-### Outdoor Sightseeing 🗺️
-- **Ideal**: Clear skies, mild temperatures (15-25°C), low precipitation
-- **Factors**: Weather clarity, temperature, precipitation, wind
-- **Score Range**: 0-100 (recommended if ≥50)
+**Outdoor Sightseeing**: Optimal at 15-25°C with clear skies, heavily penalized by precipitation and storms
 
-## 📁 Project Structure
-
-```
-Travel-Planner/
-├── src/
-│   ├── config/           # ⚙️  Configuration management
-│   ├── datasources/      # 🌐 Data sources (OpenMeteo API integration)
-│   │   └── __tests__/    # Unit tests for data sources
-│   ├── resolvers/        # 🔗 GraphQL resolvers (query implementations)
-│   ├── services/         # 💼 Business logic (activity ranking algorithms)
-│   │   └── __tests__/    # Unit tests for services
-│   ├── types/            # 📝 TypeScript types and GraphQL schema
-│   ├── utils/            # 🔧 Utility functions (weather codes, etc.)
-│   │   └── __tests__/    # Unit tests for utilities
-│   └── index.ts          # 🚀 Server entry point
-├── coverage/             # 📊 Test coverage reports (generated)
-├── dist/                 # 📦 Compiled JavaScript (generated)
-├── examples.graphql      # 📚 Example queries for testing
-├── jest.config.js        # 🧪 Jest testing configuration
-├── tsconfig.json         # 🔷 TypeScript configuration
-├── .eslintrc.js          # 📏 ESLint code quality rules
-├── .gitignore            # 🚫 Git ignore patterns
-└── package.json          # 📦 Dependencies and scripts
-```
-
-## 🔐 Environment Variables
-
-All environment variables have sensible defaults and are **optional**. The API works out of the box without any configuration!
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `4000` | Server port number |
-| `NODE_ENV` | `development` | Environment mode (`development` or `production`) |
-| `REQUEST_TIMEOUT` | `5000` | API request timeout in milliseconds |
-| `MAX_CITY_SUGGESTIONS` | `10` | Maximum city search results to return |
-| `OPENMETEO_GEOCODING_URL` | `https://geocoding-api.openmeteo.com/v1` | Geocoding API base URL |
-| `OPENMETEO_WEATHER_URL` | `https://api.open-meteo.com/v1` | Weather API base URL |
-
-💡 **Tip:** You can create a `.env` file in the root directory to customize these values (check `.env.example` if needed).
-
-## ⚡ API Limits
-
-- **City Search**: Up to 50 results per query (default: 10)
-- **Weather Forecast**: Up to 16 days (default: 7)
-- **Request Timeout**: 5 seconds
-
-## ⚠️ Error Handling
-
-The API provides clear, actionable error messages with appropriate GraphQL error extensions:
-
-| Error Code | HTTP Status | Description |
-|------------|-------------|-------------|
-| `CITY_NOT_FOUND` | 404 | The requested city wasn't found |
-| `WEATHER_API_ERROR` | 502 | External weather API error |
-| `VALIDATION_ERROR` | 400 | Invalid input parameters |
-| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |
-
-## 🧪 Testing
-
-The project includes comprehensive unit tests for all core functionality.
+## Testing
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode (great for development)
-npm run test:watch
-
-# Generate coverage report
-npm test -- --coverage
+npm test                 # Run all tests with coverage
+npm run test:watch       # Watch mode for development
 ```
 
-✅ **Test Coverage:** The project maintains >70% code coverage across all metrics.
+Test suite covers:
 
-## 🔍 How It Works
+- OpenMeteo API wrapper (integration with external API)
+- Activity ranking algorithms (core business logic)
+- Weather code utilities
 
-1. **Weather Data:** Uses the [Open-Meteo API](https://open-meteo.com/) - a free, open-source weather API with no API key required
-2. **Activity Ranking:** Smart scoring algorithm evaluates weather conditions against ideal parameters for each activity
-3. **GraphQL:** Clean, type-safe API with excellent developer experience via Apollo Server
+**Current Coverage: 77.7%**
 
-## 🚧 Future Improvements
+The main gap is resolver tests (0% coverage). See trade-offs section below.
 
-Ideas for enhancement (contributions welcome!):
+## Configuration
 
-- [ ] Add Redis caching for improved performance
-- [ ] Implement rate limiting for production use
-- [ ] More activity types (hiking, beach days, photography, etc.)
-- [ ] User preference profiles
-- [ ] Integration with booking/reservation APIs
-- [ ] Historical weather data analysis
-- [ ] Mobile push notifications for weather changes
+All configuration uses environment variables with sensible defaults:
 
-## 👥 Contributing
+```
+PORT=4000
+NODE_ENV=development
+REQUEST_TIMEOUT=5000
+MAX_CITY_SUGGESTIONS=10
+```
 
-This is a team project! If you want to contribute:
+Optional: Create a `.env` file to override defaults.
 
-1. Create a new branch: `git checkout -b feature/your-feature-name`
-2. Make your changes and write tests
-3. Run tests and linting: `npm test && npm run lint`
-4. Commit with clear messages: `git commit -m "Add: your feature description"`
-5. Push and create a Pull Request
+## Available Commands
 
-## 📄 License
+```bash
+npm run dev          
+npm run build        
+npm start            
+npm test             
+npm run lint        
+```
+
+## Trade-offs & Omissions
+
+Given the 2-3 hour time constraint, I prioritized core functionality over nice-to-haves:
+
+### No Caching
+
+Weather data changes slowly (hourly updates at most), making it ideal for caching. In production I'd add:
+
+- Redis for API response caching (TTL: 30-60 minutes)
+- Significant performance improvement and reduced API calls
+- Estimated implementation time: 1-2 hours
+
+### Basic Activity Scoring
+
+Current implementation uses rule-based scoring with hardcoded weights. Future improvements:
+
+- Machine learning model trained on historical weather/activity data
+- User preference profiles (some people prefer cold weather skiing)
+- More granular scoring (consider UV index, visibility, etc.)
+
+### No Resolver Integration Tests
+
+Resolvers have 0% coverage. This was intentional:
+
+- Time was better spent testing business logic (services, datasources)
+-  Resolvers are thin layers that mostly pass data through
+- Integration tests require more setup (Apollo server instance, context mocking)
+-   Core algorithms ARE tested where actual logic lives
+
+For production, I'd add integration tests using Apollo's executeOperation method.
+
+### Limited Error Handling
+
+Current implementation handles common cases but lacks:
+
+- Retry logic for transient network failures
+- Circuit breaker pattern for API resilience
+- Rate limiting protection
+- Detailed error logging/monitoring
+
+### Security Considerations
+
+Not implemented due to time constraints:
+
+- No authentication/authorization (required for multi-user scenarios)
+- No input sanitization beyond basic validation
+- No rate limiting per user/IP
+
+## Future Enhancements
+
+If I had more time or for production deployment:
+
+1. **Caching Layer** - Redis integration for API responses
+2. **More Activities** - Hiking, beach days, photography, cycling
+3. **Personalization** - User profiles with activity preferences
+4. **Historical Data** - "Best time to visit" based on past weather patterns
+5. **Monitoring** - Structured logging, error tracking, performance metrics
+6. **GraphQL Subscriptions** - Real-time weather alerts
+7. **API Documentation** - Auto-generated docs from schema
+
+## Development Notes
+
+**Why Open-Meteo?**
+
+- Free tier with no API key required
+- Good documentation and reliable uptime
+- Provides both geocoding and weather data ,good with axios 
+
+**Why GraphQL?**
+
+- Flexible querying (clients request exactly what they need)
+- Strong typing with schema validation
+- Single endpoint reduces complexity
+
+**Use of AI Tools**
+I used GitHub Copilot for:
+
+- Boilerplate code (server setup, type definitions)
+- Test scaffolding and mock data
+- Repetitive implementations
+
+I manually designed and implemented:
+
+- Activity ranking algorithm and scoring weights
+- Architecture and separation of concerns
+- Error handling strategy
+- Trade-off decisions based on time constraints
+
+## Tech Stack
+
+- **Runtime**: Node.js 18+
+- **Language**: TypeScript
+- **GraphQL Server**: Apollo Server 4
+- **HTTP Client**: Axios
+- **Testing**: Jest
+- **Data Source**: Open-Meteo API
+
+Reflection:
+I focused on building a clean, testable backend with clear separation of data and logic.
+While the features are simple, the structure is production-ready and designed for easy growth — caching, personalization, or analytics could be added with minimal refactoring.
+
+## License
 
 MIT
-
----
-
-**Made with ❤️ for better travel planning**

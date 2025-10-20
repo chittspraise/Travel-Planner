@@ -1,31 +1,18 @@
-# ========================================
-# Travel Planner API - GraphQL Examples
-# ========================================
-# Copy and paste these queries into Apollo Sandbox at http://localhost:4000/
-#
-# Remember: Always search for a city first to get its ID,
-# then use that ID for weather and activity queries!
-# ========================================
+# Example queries for testing
 
-# ========================================
-# 1. SEARCH FOR CITIES
-# ========================================
-
-# Basic city search
+# Basic search
 query SearchCities {
-  searchCities(query: "London") {
+  searchCities(query: "Cape Town") {
     id
     name
     country
-    countryCode
     latitude
     longitude
   }
 }
 
-# Search with limit and full details
-query SearchCitiesWithDetails {
-  searchCities(query: "Paris", limit: 5) {
+query SearchWithLimit {
+  searchCities(query: "johannesburg", limit: 5) {
     id
     name
     country
@@ -37,16 +24,15 @@ query SearchCitiesWithDetails {
   }
 }
 
-# Search multiple cities
 query SearchNewYork {
   searchCities(query: "New York", limit: 3) {
     id
     name
     country
     admin1
+    population
     latitude
     longitude
-    population
   }
 }
 
@@ -60,13 +46,11 @@ query SearchTokyo {
   }
 }
 
-# ========================================
-# 2. GET WEATHER FORECAST
-# ========================================
+## Weather queries
 
-# Basic weather query (7 days default)
+#  weather for  (default 7 days)
 query GetWeatherLondon {
-  getWeather(cityId: "51.5074_-0.1278") {
+  getWeather(cityId: "33.92584_18.42322") {
     city {
       name
       latitude
@@ -84,8 +68,8 @@ query GetWeatherLondon {
   }
 }
 
-# Weather with custom days and all fields
-query GetWeatherParisFull {
+# Paris - 10 days with all fields
+query GetWeatherParis {
   getWeather(cityId: "48.8566_2.3522", days: 10) {
     city {
       name
@@ -108,8 +92,8 @@ query GetWeatherParisFull {
   }
 }
 
-# Short-term forecast (3 days)
-query GetWeatherShortTerm {
+# quick 3-day forecast
+query GetWeatherShort {
   getWeather(cityId: "40.7128_-74.006", days: 3) {
     city {
       name
@@ -125,8 +109,7 @@ query GetWeatherShortTerm {
   }
 }
 
-# Maximum forecast (16 days)
-query GetWeatherLongTerm {
+query GetWeatherMax {
   getWeather(cityId: "35.6762_139.6503", days: 16) {
     city {
       name
@@ -141,12 +124,9 @@ query GetWeatherLongTerm {
   }
 }
 
-# ========================================
-# 3. GET ACTIVITY RANKINGS
-# ========================================
+### Activity Rankings
 
-# Basic activity rankings
-query GetActivityRankings {
+query GetActivities {
   getActivityRankings(cityId: "51.5074_-0.1278", days: 7) {
     date
     weather {
@@ -163,8 +143,7 @@ query GetActivityRankings {
   }
 }
 
-# Detailed activity rankings with full weather data
-query GetActivityRankingsDetailed {
+query GetActivitiesDetailed {
   getActivityRankings(cityId: "48.8566_2.3522", days: 5) {
     date
     weather {
@@ -186,7 +165,7 @@ query GetActivityRankingsDetailed {
   }
 }
 
-# Weekend activity planning (3 days)
+# weekend planning
 query GetWeekendActivities {
   getActivityRankings(cityId: "40.7128_-74.006", days: 3) {
     date
@@ -203,12 +182,10 @@ query GetWeekendActivities {
   }
 }
 
-# ========================================
-# 4. COMPLETE TRAVEL PLAN
-# ========================================
+## Full travel plans
 
-# Complete travel plan - all information in one query
-query GetCompleteTravelPlan {
+# complete plan with everything
+query GetTravelPlan {
   getTravelPlan(cityId: "51.5074_-0.1278", days: 7) {
     city {
       name
@@ -241,8 +218,8 @@ query GetCompleteTravelPlan {
   }
 }
 
-# Concise travel plan (essential info only)
-query GetTravelPlanConcise {
+# minimal version
+query GetTravelPlanSimple {
   getTravelPlan(cityId: "48.8566_2.3522", days: 5) {
     city {
       name
@@ -268,8 +245,7 @@ query GetTravelPlanConcise {
   }
 }
 
-# Weekend trip planning
-query GetWeekendTravelPlan {
+query WeekendTrip {
   getTravelPlan(cityId: "40.7128_-74.006", days: 3) {
     city {
       name
@@ -299,8 +275,8 @@ query GetWeekendTravelPlan {
   }
 }
 
-# Two-week vacation planning
-query GetVacationPlan {
+# 2 week vacation
+query VacationPlan {
   getTravelPlan(cityId: "35.6762_139.6503", days: 14) {
     city {
       name
@@ -329,27 +305,22 @@ query GetVacationPlan {
   }
 }
 
-# ========================================
-# 5. SAMPLE CITY IDs FOR TESTING
-# ========================================
+# Sample city IDs for testing:
+# London: 51.5074_-0.1278
+# Paris: 48.8566_2.3522
+# New York: 40.7128_-74.006
+# Tokyo: 35.6762_139.6503
+# Sydney: -33.8688_151.2093
+# Dubai: 25.2048_55.2708
+# Barcelona: 41.3874_2.1686
+# Rome: 41.9028_12.4964
+# Berlin: 52.52_13.405
+# Amsterdam: 52.3676_4.9041
 
-# London, UK: 51.5074_-0.1278
-# Paris, France: 48.8566_2.3522
-# New York, USA: 40.7128_-74.006
-# Tokyo, Japan: 35.6762_139.6503
-# Sydney, Australia: -33.8688_151.2093
-# Dubai, UAE: 25.2048_55.2708
-# Barcelona, Spain: 41.3874_2.1686
-# Rome, Italy: 41.9028_12.4964
-# Berlin, Germany: 52.52_13.405
-# Amsterdam, Netherlands: 52.3676_4.9041
+## Example workflow:
 
-# ========================================
-# 6. SAMPLE WORKFLOW
-# ========================================
-
-# Step 1: Search for your destination
-query Step1_SearchCity {
+# 1. Search for destination
+query SearchBarcelona {
   searchCities(query: "Barcelona", limit: 3) {
     id
     name
@@ -360,8 +331,8 @@ query Step1_SearchCity {
   }
 }
 
-# Step 2: Use the ID from results above to get complete travel plan
-query Step2_GetTravelPlan {
+# 2. Get plan using the ID from above
+query BarcelonaPlan {
   getTravelPlan(cityId: "41.3874_2.1686", days: 7) {
     city {
       name
@@ -388,18 +359,14 @@ query Step2_GetTravelPlan {
   }
 }
 
-# ========================================
-# 7. ACTIVITY TYPE EXAMPLES
-# ========================================
+# Activity types:
+# SKIING - cold snowy weather
+# SURFING - warm with wind
+# INDOOR_SIGHTSEEING - good for bad weather
+# OUTDOOR_SIGHTSEEING - clear mild weather
 
-# Activity Types Available:
-# - SKIING: Best in cold, snowy conditions
-# - SURFING: Best in warm weather with good winds
-# - INDOOR_SIGHTSEEING: Great during bad weather
-# - OUTDOOR_SIGHTSEEING: Perfect for clear, mild weather
-
-# Example: Check skiing conditions in Alpine region
-query CheckSkiingConditions {
+# check skiing conditions
+query SkiingCheck {
   getActivityRankings(cityId: "46.0207_7.7491", days: 5) {
     date
     weather {
@@ -417,8 +384,8 @@ query CheckSkiingConditions {
   }
 }
 
-# Example: Check surfing conditions in coastal city
-query CheckSurfingConditions {
+# surfing conditions Sydney
+query SurfingCheck {
   getActivityRankings(cityId: "-33.8688_151.2093", days: 5) {
     date
     weather {
@@ -434,4 +401,3 @@ query CheckSurfingConditions {
     }
   }
 }
-

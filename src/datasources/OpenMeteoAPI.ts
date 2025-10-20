@@ -8,17 +8,21 @@ import {
   CityNotFoundError,
 } from "../types";
 
-/**
- * Wrapper around Open-Meteo API
- * Handles fetching city info and weather data.
- * Open-Meteo is great because it's free and doesn’t need an API key.
- */
+interface RawGeocodingResult {
+  latitude: number;
+  longitude: number;
+  name: string;
+  country?: string;
+  country_code?: string;
+  admin1?: string;
+  population?: number;
+}
+
 export class OpenMeteoAPI {
   private geoClient;
-  private weatherClient;
+   private weatherClient;
 
   constructor() {
-    // Set up two axios clients — one for cities, one for weather
     this.geoClient = axios.create({
       baseURL: config.openMeteo.geocodingUrl,
       timeout: config.api.requestTimeout,
@@ -30,10 +34,6 @@ export class OpenMeteoAPI {
     });
   }
 
-  /**
-   * Search for cities by name
-   * Example: "Paris" → returns list of matching cities with coordinates.
-   */
   async searchCities(query: string, limit = 10): Promise<City[]> {
     try {
       const res = await this.geoClient.get<GeocodingResponse>("/search", {
@@ -45,30 +45,21 @@ export class OpenMeteoAPI {
         },
       });
 
-      // if no cities found, throw custom error
       if (!res.data.results || res.data.results.length === 0) {
-        throw new CityNotFoundError(query);
+          throw new CityNotFoundError(query);
       }
 
-      // Map API data to our City format
       return res.data.results.map((item) => this.formatCity(item));
-    } catch (err: any) {
-      // If it’s our custom "not found" error, just pass it through
+    } catch (err: unknown) {
       if (err instanceof CityNotFoundError) throw err;
 
-      // Otherwise wrap axios/network errors
       if (axios.isAxiosError(err)) {
         throw new WeatherAPIError(`City search failed: ${err.message}`);
       }
-
-      // Unknown/unexpected error
       throw err;
     }
   }
 
-  /**
-   * Turn an ID (like "48.85_2.35") back into a City object
-   */
   async getCityById(id: string): Promise<City> {
     const [latStr, lonStr] = id.split("_");
 
@@ -81,16 +72,13 @@ export class OpenMeteoAPI {
     const lat = parseFloat(latStr);
     const lon = parseFloat(lonStr);
 
-    // check if numbers make sense
     if (isNaN(lat) || isNaN(lon)) {
       throw new WeatherAPIError(`Invalid coords in ID: ${id}`);
     }
-
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
       throw new WeatherAPIError(`Coordinates out of valid range: ${id}`);
     }
-
-    // Return a simple City object — name not included (comes from search)
+    
     return {
       id,
       name: `Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}`,
@@ -101,10 +89,6 @@ export class OpenMeteoAPI {
     };
   }
 
-  /**
-   * Get weather forecast for a given location.
-   * Default: next 7 days.
-   */
   async getWeatherForecast(
     lat: number,
     lon: number,
@@ -129,7 +113,7 @@ export class OpenMeteoAPI {
       });
 
       return res.data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         throw new WeatherAPIError(`Weather fetch failed: ${err.message}`);
       }
@@ -137,10 +121,7 @@ export class OpenMeteoAPI {
     }
   }
 
-  /**
-   * Format the raw geocoding result into a City object
-   */
-  private formatCity(raw: any): City {
+  private formatCity(raw: RawGeocodingResult): City {
     return {
       id: `${raw.latitude}_${raw.longitude}`,
       name: raw.name,

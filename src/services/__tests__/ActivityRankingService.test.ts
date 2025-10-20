@@ -16,7 +16,7 @@ describe('ActivityRankingService', () => {
                 temperatureMin: -5,
                 precipitation: 0,
                 windSpeed: 15,
-                weatherCode: 71, // Snow
+                weatherCode: 71, 
                 weatherDescription: 'Slight snow fall',
                 snowfall: 10,
             };
@@ -24,20 +24,20 @@ describe('ActivityRankingService', () => {
             const result = service.rankActivities(weather);
 
             expect(result).toHaveLength(4);
-            expect(result[0].type).toBe(ActivityType.SKIING);
-            expect(result[0].score).toBeGreaterThan(50);
+             expect(result[0].type).toBe(ActivityType.SKIING);
+             expect(result[0].score).toBeGreaterThan(50);
             expect(result[0].recommended).toBe(true);
-        });
+        })
 
         it('should rank outdoor sightseeing highest in clear warm weather', () => {
             const weather: WeatherForecast = {
-                date: '2024-06-15',
-                temperatureMax: 24,
+                 date: '2024-06-15',
+                 temperatureMax: 24,
                 temperatureMin: 18,
                 precipitation: 0,
                 windSpeed: 10,
-                weatherCode: 0, // Clear sky
-                weatherDescription: 'Clear sky',
+                weatherCode: 0, 
+                weatherDescription: 'Clear sky'
             };
 
             const result = service.rankActivities(weather);
@@ -45,18 +45,18 @@ describe('ActivityRankingService', () => {
             expect(result).toHaveLength(4);
             expect(result[0].type).toBe(ActivityType.OUTDOOR_SIGHTSEEING);
             expect(result[0].score).toBeGreaterThan(50);
-            expect(result[0].recommended).toBe(true);
-        });
+            expect(result[0].recommended).toBe(true)
+        })
 
         it('should rank indoor sightseeing highest in stormy weather', () => {
-            const weather: WeatherForecast = {
+        const weather: WeatherForecast = {
                 date: '2024-07-15',
-                temperatureMax: 22,
-                temperatureMin: 16,
+                  temperatureMax: 22,
+                 temperatureMin: 16,
                 precipitation: 25,
-                windSpeed: 45,
-                weatherCode: 95, // Thunderstorm
-                weatherDescription: 'Thunderstorm',
+             windSpeed: 45,
+                  weatherCode: 95, 
+                weatherDescription: 'Thunderstorm'
             };
 
             const result = service.rankActivities(weather);
@@ -74,7 +74,7 @@ describe('ActivityRankingService', () => {
                 temperatureMin: 22,
                 precipitation: 0,
                 windSpeed: 25,
-                weatherCode: 1, // Mainly clear
+                weatherCode: 1, 
                 weatherDescription: 'Mainly clear',
             };
 
@@ -111,7 +111,7 @@ describe('ActivityRankingService', () => {
                 temperatureMin: 6,
                 precipitation: 3,
                 windSpeed: 20,
-                weatherCode: 61, // Slight rain
+                weatherCode: 61, 
                 weatherDescription: 'Slight rain',
             };
 
@@ -132,7 +132,7 @@ describe('ActivityRankingService', () => {
             expect(types).toContain(ActivityType.OUTDOOR_SIGHTSEEING);
         });
 
-        it('should provide meaningful reasons for rankings', () => {
+    it('should provide meaningful reasons for rankings', () => {
             const weather: WeatherForecast = {
                 date: '2024-01-15',
                 temperatureMax: 2,
@@ -152,14 +152,14 @@ describe('ActivityRankingService', () => {
             });
         });
 
-        it('should clamp scores between 0 and 100', () => {
+    it('should clamp scores between 0 and 100', () => {
             const extremeWeather: WeatherForecast = {
-                date: '2024-01-15',
+                  date: '2024-01-15',
                 temperatureMax: 45,
-                temperatureMin: 40,
+                  temperatureMin: 40,
                 precipitation: 50,
-                windSpeed: 100,
-                weatherCode: 99, // Thunderstorm with heavy hail
+                 windSpeed: 100,
+                 weatherCode: 99, 
                 weatherDescription: 'Thunderstorm with heavy hail',
             };
 
@@ -167,9 +167,9 @@ describe('ActivityRankingService', () => {
 
             result.forEach(activity => {
                 expect(activity.score).toBeGreaterThanOrEqual(0);
-                expect(activity.score).toBeLessThanOrEqual(100);
+                  expect(activity.score).toBeLessThanOrEqual(100);
             });
         });
     });
-});
+})
 

@@ -1,4 +1,4 @@
-// Domain types
+// City data from geocoding API
 export interface City {
     id: string;
     name: string;
@@ -6,7 +6,7 @@ export interface City {
     countryCode: string;
     latitude: number;
     longitude: number;
-    admin1?: string;
+    admin1?: string; 
     population?: number;
 }
 
@@ -27,11 +27,12 @@ export interface Weather {
     forecasts: WeatherForecast[];
 }
 
+// Types of activities 
 export enum ActivityType {
     SKIING = 'SKIING',
     SURFING = 'SURFING',
     INDOOR_SIGHTSEEING = 'INDOOR_SIGHTSEEING',
-    OUTDOOR_SIGHTSEEING = 'OUTDOOR_SIGHTSEEING',
+    OUTDOOR_SIGHTSEEING = 'OUTDOOR_SIGHTSEEING'
 }
 
 export interface RankedActivity {
@@ -53,7 +54,7 @@ export interface TravelPlan {
     activityRankings: ActivityRanking[];
 }
 
-// External API response types
+// Raw API response types from Open-Meteo
 export interface GeocodingResult {
     id: number;
     name: string;
@@ -86,7 +87,7 @@ export interface WeatherResponse {
     };
 }
 
-// Error types
+// Custom error classes
 export class TravelPlannerError extends Error {
     constructor(
         message: string,
@@ -119,4 +120,3 @@ export class ValidationError extends TravelPlannerError {
         this.name = 'ValidationError';
     }
 }
-
